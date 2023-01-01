@@ -31,4 +31,4 @@ kind-deploy: build-docker
 #	swagger generate spec -i ./swagger/swagger_base.yaml -o ./swagger.yaml
 
 swagger-serve:
-	cd swagger && swagger serve --flatten --port=9009 -F=swagger main.yaml
+	cd swagger && swagger serve --flatten --port=9009 -F=swagger swagger.yaml
