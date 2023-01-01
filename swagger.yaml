@@ -1,0 +1,18 @@
+host: 127.0.0.1:3000
+paths:
+    /layers:
+        get:
+            operationId: uniqueLayers
+            parameters:
+                - description: maximum numnber of results to return
+                  format: int32
+                  in: query
+                  name: limit
+                  type: integer
+            summary: Lists pets filtered by some parameters.
+            tags:
+                - pets
+                - users
+schemes:
+    - http
+swagger: "2.0"
