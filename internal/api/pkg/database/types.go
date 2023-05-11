@@ -2,6 +2,10 @@ package database
 
 import "time"
 
+type UniqueProjects struct {
+	Projects []string `json:"projects"`
+}
+
 type UniqueProducts struct {
 	Products []string `json:"uniqueproducts"`
 }

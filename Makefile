@@ -1,10 +1,13 @@
 BUILDVERSION:=latest
+DOCKERIMAGE:=stackmap-api:$(BUILDVERSION)
 
-get-docs:
-	go get -u github.com/swaggo/swag/cmd/swag
+#get-docs:
+#	go get -u github.com/swaggo/swag/cmd/swag
 
-docs: get-docs
-	swag init --dir cmd/api --parseDependency --output docs
+#docs: get-docs
+#	swag init --dir cmd/api --parseDependency --output docs
+.PHONY: kind-load
+.PHONY: build-docker
 
 build:
 	go build -o bin/restapi cmd/api/main.go
@@ -12,20 +15,23 @@ build:
 run:
 	go run cmd/api/main.go
 
-test:
-	go test -v ./test/...
+#test:
+#	go test -v ./test/...
 
 build-docker: build
-	docker build . -t api-rest:$(BUILDVERSION)
+	docker build . -t $(DOCKERIMAGE)
 
 run-docker: build-docker
-	docker run -p 3000:3000 api-rest:$(BUILDVERSION)
+	docker run -p 3000:3000 $(DOCKERIMAGE)
 
 port-forward:
 	kubectl port-forward svc/postgresql 5432:5432
 
-kind-deploy: build-docker
-	kind load docker-image api-rest:$(BUILDVERSION) && kubectl apply -f deployment.yaml 
+kind-load: build-docker
+	kind load docker-image $(DOCKERIMAGE)
+
+kind-deploy: kind-load
+	kubectl apply -f deployment.yaml 
 
 #swagger-build:
 #	swagger generate spec -i ./swagger/swagger_base.yaml -o ./swagger.yaml
