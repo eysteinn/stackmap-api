@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: stackmap-api
-          image: api-rest:latest
+          #image: api-rest:latest
+          image: stackmap-api:latest
           imagePullPolicy: Never
           env:
           - name: PSQLHOST
@@ -38,7 +39,7 @@ kind: Service
 metadata:
   name: psqlapi-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: stackmap-api
   ports:

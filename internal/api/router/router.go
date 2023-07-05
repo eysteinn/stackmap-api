@@ -29,7 +29,8 @@ func Cors(next http.Handler) http.Handler {
 */
 func timesRoute(w http.ResponseWriter, r *http.Request) {
 	product := r.URL.Query().Get("product")
-	layers, err := database.GetAvailableTimes(product)
+	project := r.URL.Query().Get("project")
+	layers, err := database.GetAvailableTimes(project, product)
 	if err != nil {
 		w.WriteHeader(404)
 		w.Write([]byte(fmt.Sprint(err)))
@@ -51,7 +52,58 @@ func products() *chi.Mux {
 	type Layer struct {
 		product string
 	}
-	router.Get("/products", func(w http.ResponseWriter, r *http.Request) {
+	router.Get("/projects", func(w http.ResponseWriter, r *http.Request) {
+		projects, err := database.GetUniqueProjects()
+		if err != nil {
+			w.WriteHeader(404)
+			w.Write([]byte(fmt.Sprint(err)))
+			return
+		}
+
+		response, _ := json.Marshal(projects)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		w.Write(response)
+	})
+
+	router.Route("/projects/{project}", func(router chi.Router) {
+		router.Get("/products", func(w http.ResponseWriter, r *http.Request) {
+			project := chi.URLParam(r, "project")
+			layers, err := database.GetUniqueProducts(project)
+			if err != nil {
+				w.WriteHeader(404)
+				w.Write([]byte(fmt.Sprint(err)))
+				return
+			}
+
+			response, _ := json.Marshal(layers)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(200)
+			w.Write(response)
+		})
+		router.Route("/products/{product}/", func(router chi.Router) {
+			router.Get("/times", func(w http.ResponseWriter, r *http.Request) {
+				/*w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(200)
+				w.Write([]byte(chi.URLParam(r, "product") + "   " + chi.URLParam(r, "project")))*/
+				project := chi.URLParam(r, "project")
+				product := chi.URLParam(r, "product")
+				layers, err := database.GetAvailableTimes(project, product)
+				if err != nil {
+					w.WriteHeader(404)
+					w.Write([]byte(fmt.Sprint(err)))
+					return
+				}
+
+				response, _ := json.Marshal(layers)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(200)
+				w.Write(response)
+			})
+		},
+		)
+	})
+	/*router.Get("/products", func(w http.ResponseWriter, r *http.Request) {
 		// swagger:route GET /products pets users uniqueLayers
 		//
 		// Lists pets filtered by some parameters.
@@ -75,7 +127,7 @@ func products() *chi.Mux {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		w.Write(response)
-	})
+	})*/
 	return router
 }
 func Setup() *chi.Mux {

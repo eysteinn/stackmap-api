@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"gorm.io/driver/postgres"
+	"gorm.io/gorm/logger"
 
 	"gorm.io/gorm"
 )
@@ -30,7 +31,9 @@ func setup() error {
 	dsn := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, username, dbName, password)
 	//dsn := "host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
 	fmt.Println("DSN: ", dsn)
-	dbase, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	dbase, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 
 	if err != nil {
 		fmt.Println("We cant op open a DATABASE")
