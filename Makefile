@@ -18,7 +18,7 @@ run:
 #test:
 #	go test -v ./test/...
 
-build-docker: build
+build-docker: #build
 	docker build . -t $(DOCKERIMAGE)
 
 run-docker: build-docker
@@ -32,6 +32,9 @@ kind-load: build-docker
 
 kind-deploy: kind-load
 	kubectl apply -f deployment.yaml 
+
+k3s-deploy:
+	docker save $(DOCKERIMAGE) | sudo k3s ctr images import -
 
 #swagger-build:
 #	swagger generate spec -i ./swagger/swagger_base.yaml -o ./swagger.yaml
