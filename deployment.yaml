@@ -21,7 +21,7 @@ spec:
           imagePullPolicy: Never
           env:
           - name: PSQLHOST
-            value: postgresql.default.svc.cluster.local
+            value: stackmap-db-postgresql.default.svc.cluster.local
           - name: PSQLUSER
             value: postgres
           - name: PSQLDB
@@ -29,7 +29,7 @@ spec:
           - name: PSQLPASS
             valueFrom:
               secretKeyRef:
-                name: postgresql
+                name: stackmap-db-postgresql
                 key: postgres-password
 
 ---
@@ -37,15 +37,37 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: psqlapi-service
+  name: stackmap-api
 spec:
   type: ClusterIP
   selector:
     app: stackmap-api
   ports:
     - protocol: TCP
-      port: 3003
+      port: 3000
       targetPort: 3000
       #nodePort: 3000
 
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api
+    #annotations:
+    #haproxy.org/path-rewrite: "/"
+spec:
+  #ingressClassName: haproxy
+  ingressClassName: traefik
+  rules:
+  - host: stackmap.clouds.is
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: stackmap-api
+            port:
+              number: 3000
 ---
