@@ -7,5 +7,5 @@ import (
 //go:generate swagger generate spec
 
 func main() {
-	api.Run(":3000")
+	api.Run("0.0.0.0:3000")
 }
