@@ -27,8 +27,9 @@ func setup() error {
 	password := getEnv("PSQLPASS", "") //3L5JaSDTDC"
 	dbName := getEnv("PSQLDB", "postgres")
 	dbHost := getEnv("PSQLHOST", "localhost")
+	dbPort := getEnv("PSQLPORT", "5432")
 
-	dsn := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, username, dbName, password)
+	dsn := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s port=%s", dbHost, username, dbName, password, dbPort)
 	//dsn := "host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
 	fmt.Println("DSN: ", dsn)
 	dbase, err := gorm.Open(postgres.Open(dsn), &gorm.Config{

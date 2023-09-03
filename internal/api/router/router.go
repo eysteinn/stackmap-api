@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"gitlab.com/EysteinnSig/stackmap-api/internal/api/pkg/database"
+	"gitlab.com/EysteinnSig/stackmap-api/internal/api/pkg/projects"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -52,7 +53,9 @@ func products() *chi.Mux {
 	type Layer struct {
 		product string
 	}
-	router.Get("/projects", func(w http.ResponseWriter, r *http.Request) {
+
+	router.Post("/projects", projects.PostHandler)
+	/*router.Get("/projects", func(w http.ResponseWriter, r *http.Request) {
 		projects, err := database.GetUniqueProjects()
 		if err != nil {
 			w.WriteHeader(404)
@@ -64,45 +67,50 @@ func products() *chi.Mux {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		w.Write(response)
+	})*/
+	router.Delete("/projects/{project}", projects.DeleteHandler)
+	router.Get("/projects", projects.GetHandler)
+
+	//router.Route("/projects/{project}", func(router chi.Router) {
+	//router.Get("/products", func(w http.ResponseWriter, r *http.Request) {
+	router.Get("/projects/{project}/products", func(w http.ResponseWriter, r *http.Request) {
+
+		project := chi.URLParam(r, "project")
+		layers, err := database.GetUniqueProducts(project)
+		if err != nil {
+			w.WriteHeader(404)
+			w.Write([]byte(fmt.Sprint(err)))
+			return
+		}
+
+		response, _ := json.Marshal(layers)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		w.Write(response)
 	})
+	//router.Route("/products/{product}/", func(router chi.Router) {
+	router.Get("/projects/{project}/products/{product}/times", func(w http.ResponseWriter, r *http.Request) {
+		/*w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		w.Write([]byte(chi.URLParam(r, "product") + "   " + chi.URLParam(r, "project")))*/
+		project := chi.URLParam(r, "project")
+		product := chi.URLParam(r, "product")
+		layers, err := database.GetAvailableTimes(project, product)
+		if err != nil {
+			w.WriteHeader(404)
+			w.Write([]byte(fmt.Sprint(err)))
+			return
+		}
 
-	router.Route("/projects/{project}", func(router chi.Router) {
-		router.Get("/products", func(w http.ResponseWriter, r *http.Request) {
-			project := chi.URLParam(r, "project")
-			layers, err := database.GetUniqueProducts(project)
-			if err != nil {
-				w.WriteHeader(404)
-				w.Write([]byte(fmt.Sprint(err)))
-				return
-			}
-
-			response, _ := json.Marshal(layers)
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(200)
-			w.Write(response)
-		})
-		router.Route("/products/{product}/", func(router chi.Router) {
-			router.Get("/times", func(w http.ResponseWriter, r *http.Request) {
-				/*w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(200)
-				w.Write([]byte(chi.URLParam(r, "product") + "   " + chi.URLParam(r, "project")))*/
-				project := chi.URLParam(r, "project")
-				product := chi.URLParam(r, "product")
-				layers, err := database.GetAvailableTimes(project, product)
-				if err != nil {
-					w.WriteHeader(404)
-					w.Write([]byte(fmt.Sprint(err)))
-					return
-				}
-
-				response, _ := json.Marshal(layers)
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(200)
-				w.Write(response)
-			})
-		},
-		)
+		response, _ := json.Marshal(layers)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		w.Write(response)
 	})
+	/*},
+	)*/
+	//})
+
 	/*router.Get("/products", func(w http.ResponseWriter, r *http.Request) {
 		// swagger:route GET /products pets users uniqueLayers
 		//
