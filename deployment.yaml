@@ -18,10 +18,8 @@ spec:
       - name: ghcr-login-secret
       containers:
         - name: stackmap-api
-          #image: api-rest:latest
           image: ghcr.io/eysteinn/stackmap-api:main
           imagePullPolicy: Always
-          imagePullPolicy: Never
           env:
           - name: PSQLHOST
             value: stackmap-db-postgresql.default.svc.cluster.local
