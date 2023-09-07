@@ -14,10 +14,13 @@ spec:
         app: stackmap-api
         test: abc
     spec:
+      imagePullSecrets:
+      - name: ghcr-login-secret
       containers:
         - name: stackmap-api
           #image: api-rest:latest
-          image: stackmap-api:latest
+          image: ghcr.io/eysteinn/stackmap-api:main
+          imagePullPolicy: Always
           imagePullPolicy: Never
           env:
           - name: PSQLHOST
