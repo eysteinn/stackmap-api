@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"gitlab.com/EysteinnSig/stackmap-api/internal/api/pkg/database"
+	"gitlab.com/EysteinnSig/stackmap-api/internal/api/pkg/files"
 	"gitlab.com/EysteinnSig/stackmap-api/internal/api/pkg/projects"
 
 	"github.com/go-chi/chi/v5"
@@ -88,6 +89,8 @@ func products() *chi.Mux {
 		w.WriteHeader(200)
 		w.Write(response)
 	})
+
+	router.Get("/projects/{project}/files", files.GetHandler)
 	//router.Route("/products/{product}/", func(router chi.Router) {
 	router.Get("/projects/{project}/products/{product}/times", func(w http.ResponseWriter, r *http.Request) {
 		/*w.Header().Set("Content-Type", "application/json")

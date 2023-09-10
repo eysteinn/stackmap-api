@@ -6,16 +6,17 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"gitlab.com/EysteinnSig/stackmap-api/internal/api/pkg/psql"
 )
 
 func DeleteProject(project string) error {
 
-	schema, err := sanitizeSchemaName("project_" + project)
+	schema, err := psql.SanitizeSchemaName("project_" + project)
 	if err != nil {
 		return err
 	}
 
-	db, err := GetDB()
+	db, err := psql.GetDB()
 	if err != nil {
 		return fmt.Errorf("internal error")
 	}
