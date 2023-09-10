@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"gitlab.com/EysteinnSig/stackmap-api/internal/api/pkg/psql"
 )
 
 func GetProjects() ([]string, error) {
-	db, err := GetDB()
+	db, err := psql.GetDB()
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

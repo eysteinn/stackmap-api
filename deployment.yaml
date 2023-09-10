@@ -14,11 +14,12 @@ spec:
         app: stackmap-api
         test: abc
     spec:
+      imagePullSecrets:
+      - name: ghcr-login-secret
       containers:
         - name: stackmap-api
-          #image: api-rest:latest
-          image: stackmap-api:latest
-          imagePullPolicy: Never
+          image: ghcr.io/eysteinn/stackmap-api:latest
+          imagePullPolicy: Always
           env:
           - name: PSQLHOST
             value: stackmap-db-postgresql.default.svc.cluster.local
@@ -49,25 +50,40 @@ spec:
       #nodePort: 3000
 
 ---
-
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
 metadata:
   name: api
-    #annotations:
-    #haproxy.org/path-rewrite: "/"
 spec:
-  #ingressClassName: haproxy
-  ingressClassName: traefik
-  rules:
-  - host: stackmap.clouds.is
-    http:
-      paths:
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: stackmap-api
-            port:
-              number: 3000
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`stackmap.clouds.is`) && PathPrefix(`/api/v1/projects`)
+      kind: Rule
+      services:
+        - name: stackmap-api
+          port: 3000
+
 ---
+
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: api
+#     #annotations:
+#     #haproxy.org/path-rewrite: "/"
+# spec:
+#   #ingressClassName: haproxy
+#   ingressClassName: traefik
+#   rules:
+#   - host: stackmap.clouds.is
+#     http:
+#       paths:
+#       - path: /api
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: stackmap-api
+#             port:
+#               number: 3000
+# ---
