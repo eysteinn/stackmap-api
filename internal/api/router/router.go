@@ -8,6 +8,7 @@ import (
 
 	"gitlab.com/EysteinnSig/stackmap-api/internal/api/pkg/database"
 	"gitlab.com/EysteinnSig/stackmap-api/internal/api/pkg/files"
+	"gitlab.com/EysteinnSig/stackmap-api/internal/api/pkg/products"
 	"gitlab.com/EysteinnSig/stackmap-api/internal/api/pkg/projects"
 
 	"github.com/go-chi/chi/v5"
@@ -50,7 +51,7 @@ func timesRoute(w http.ResponseWriter, r *http.Request) {
 	return router
 }*/
 
-func products() *chi.Mux {
+func products_routes() *chi.Mux {
 	log.Println("Setting up routing.")
 	router := chi.NewRouter()
 	type Layer struct {
@@ -76,7 +77,7 @@ func products() *chi.Mux {
 
 	//router.Route("/projects/{project}", func(router chi.Router) {
 	//router.Get("/products", func(w http.ResponseWriter, r *http.Request) {
-	router.Get("/projects/{project}/products", func(w http.ResponseWriter, r *http.Request) {
+	/*router.Get("/projects/{project}/products", func(w http.ResponseWriter, r *http.Request) {
 
 		project := chi.URLParam(r, "project")
 		layers, err := database.GetUniqueProducts(project)
@@ -90,7 +91,8 @@ func products() *chi.Mux {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		w.Write(response)
-	})
+	})*/
+	router.Get("/projects/{project}/products", products.GetHandler)
 
 	router.Get("/projects/{project}/files", files.GetHandler)
 	//router.Route("/products/{product}/", func(router chi.Router) {
@@ -158,7 +160,7 @@ func Setup() *chi.Mux {
 	  }))*/
 	router.Use(Cors)
 	router.Use(middleware.Logger)
-	router.Mount("/api/v1/", products())
+	router.Mount("/api/v1/", products_routes())
 
 	router.Get("/api/v1/times", timesRoute)
 	//router.HandleFunc("/*", http.NotFoundHandler().ServeHTTP)
