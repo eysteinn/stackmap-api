@@ -53,6 +53,11 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if projects != nil {
 		resp["projects"] = projects
+		keys := make([]string, 0, len(projects))
+		for k := range projects {
+			keys = append(keys, k)
+		}
+		resp["project_names"] = keys
 	}
 
 	w.WriteHeader(retcode)
