@@ -22,7 +22,7 @@ func GetProducts(project string) (map[string]Product, error) {
 		log.Println(err)
 		return nil, err
 	}
-	cmd := "select uuid from " + schema + ".raster_geoms;"
+	cmd := "SELECT DISTINCT product FROM " + schema + ".raster_geoms;"
 
 	//cmd := "select regexp_replace(n1.schema_name, '^project_', '') as project from (select schema_name from information_schema.schemata where schema_name ~ '^project*') n1;"
 
@@ -59,11 +59,17 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 
 	products, err := GetProducts(project)
 	if err != nil {
+		log.Print(err)
 		retcode = http.StatusInternalServerError
 		resp["message"] = "Internal error"
 		resp["success"] = false
 	} else {
 		resp["products"] = products
+		keys := make([]string, 0, len(products))
+		for k := range products {
+			keys = append(keys, k)
+		}
+		resp["product_names"] = keys
 	}
 
 	w.WriteHeader(retcode)

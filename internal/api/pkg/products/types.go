@@ -1,7 +1,7 @@
 package products
 
 type Product struct {
-	Name string
+	Name string `json:"name"`
 	//WMSUrl  string
 	//WMTSUrl string
 }
