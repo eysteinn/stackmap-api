@@ -3,6 +3,7 @@ package projects
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -11,6 +12,7 @@ import (
 )
 
 func CreateProject(project Project) error {
+	log.Println("Creating project: " + project.Name)
 	db, err := psql.GetDB()
 	if err != nil {
 		return err
@@ -68,6 +70,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if name == "" {
+		log.Println("Missing name")
 		resp["success"] = false
 		resp["message"] = "missing 'name' parameter"
 		w.WriteHeader(http.StatusBadRequest)
@@ -82,7 +85,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := CreateProject(project)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		resp["success"] = false
 		resp["message"] = fmt.Sprint("error creating project")
 		w.WriteHeader(http.StatusBadRequest)
@@ -91,6 +94,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("Project created successfully")
 	resp["project"] = project
 	w.WriteHeader(http.StatusOK)
 	b, _ := json.Marshal(resp)

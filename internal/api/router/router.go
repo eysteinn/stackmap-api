@@ -3,6 +3,7 @@ package router
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"gitlab.com/EysteinnSig/stackmap-api/internal/api/pkg/database"
@@ -50,6 +51,7 @@ func timesRoute(w http.ResponseWriter, r *http.Request) {
 }*/
 
 func products() *chi.Mux {
+	log.Println("Setting up routing.")
 	router := chi.NewRouter()
 	type Layer struct {
 		product string
@@ -159,6 +161,12 @@ func Setup() *chi.Mux {
 	router.Mount("/api/v1/", products())
 
 	router.Get("/api/v1/times", timesRoute)
+	//router.HandleFunc("/*", http.NotFoundHandler().ServeHTTP)
+
+	router.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Problem with routing")
+		http.Error(w, "404 page not found, problem with routing", http.StatusNotFound)
+	})
 	/*router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		db := database.GetDB()
 		fmt.Println(db)

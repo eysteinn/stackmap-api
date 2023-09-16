@@ -8,7 +8,7 @@ import (
 	"gitlab.com/EysteinnSig/stackmap-api/internal/api/pkg/psql"
 )
 
-func GetProjects() ([]string, error) {
+func GetProjects() (map[string]Project, error) {
 	db, err := psql.GetDB()
 	if err != nil {
 		fmt.Println(err)
@@ -23,20 +23,22 @@ func GetProjects() ([]string, error) {
 	}
 	defer rows.Close()
 
-	projects := []string{}
+	projects := map[string]Project{}
 	for rows.Next() {
-		var p string
-		err = rows.Scan(&p)
+		var p Project
+		err = rows.Scan(&p.Name)
 		if err != nil {
 			return nil, err
 		}
-		projects = append(projects, p)
+		projects[p.Name] = p
+		//projects = append(projects, p)
 	}
 	return projects, nil
 }
 
 func GetHandler(w http.ResponseWriter, r *http.Request) {
 
+	fmt.Println("Handling get project request")
 	resp := map[string]interface{}{}
 	resp["success"] = true
 	resp["message"] = "projects fetched succesfully"
