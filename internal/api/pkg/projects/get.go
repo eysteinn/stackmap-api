@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"path"
 
 	"gitlab.com/EysteinnSig/stackmap-api/internal/api/pkg/psql"
 )
@@ -36,6 +37,10 @@ func GetProjects() (map[string]Project, error) {
 	return projects, nil
 }
 
+func GetWMSGetCapabilities(host string, project string) string {
+	return path.Join(host, "/services/wms?map=/mapfiles/"+project+"/rasters.map&request=GetCapabilities&service=WMS")
+}
+
 func GetHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Handling get project request")
@@ -52,12 +57,16 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 		resp["message"] = "failed to get projects"
 	}
 	if projects != nil {
-		resp["projects"] = projects
 		keys := make([]string, 0, len(projects))
 		for k := range projects {
+			tmp := projects[k]
+			tmp.WMSurl = GetWMSGetCapabilities(r.Host, k)
+			projects[k] = tmp
+
 			keys = append(keys, k)
 		}
 		resp["project_names"] = keys
+		resp["projects"] = projects
 	}
 
 	w.WriteHeader(retcode)
