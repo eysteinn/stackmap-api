@@ -90,9 +90,18 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 				name = v[0]
 			}
 		}
+	case "application/x-www-form-urlencoded":
+		for k, v := range r.PostForm {
+			fmt.Println(k, "=", v)
+			if k == "name" && len(v) > 0 {
+				name = v[0]
+			}
+		}
 	default:
+
 		resp["success"] = false
 		resp["message"] = "ContentType should be multipart/form-data, got " + contenttype + " instead."
+		fmt.Println(resp["message"])
 		w.WriteHeader(http.StatusBadRequest)
 		b, _ := json.Marshal(resp)
 		w.Write(b)
