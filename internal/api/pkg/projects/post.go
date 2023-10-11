@@ -85,6 +85,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	case "multipart/form-data":
 		r.ParseMultipartForm(10 << 20) // 10 MB
 		for k, v := range r.PostForm {
+			fmt.Println(k, "=", v)
 			if k == "name" && len(v) > 0 {
 				name = v[0]
 			}
