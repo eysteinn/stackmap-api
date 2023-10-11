@@ -76,6 +76,11 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Post request")
 	contenttype := requests.GetContent(r)
 	name := ""
+	resp := map[string]interface{}{}
+	resp["success"] = true
+	resp["message"] = "layer created succesfully"
+	w.Header().Set("Content-Type", "application/json")
+
 	switch contenttype {
 	case "multipart/form-data":
 		r.ParseMultipartForm(10 << 20) // 10 MB
@@ -84,12 +89,14 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 				name = v[0]
 			}
 		}
+	default:
+		resp["success"] = false
+		resp["message"] = "ContentType should be multipart/form-data, got " + contenttype + " instead."
+		w.WriteHeader(http.StatusBadRequest)
+		b, _ := json.Marshal(resp)
+		w.Write(b)
+		return
 	}
-
-	resp := map[string]interface{}{}
-	resp["success"] = true
-	resp["message"] = "layer created succesfully"
-	w.Header().Set("Content-Type", "application/json")
 
 	if name == "" {
 		log.Println("Missing name")
