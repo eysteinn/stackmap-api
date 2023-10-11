@@ -36,6 +36,12 @@ kind-deploy: kind-load
 k3s-deploy:
 	docker save $(DOCKERIMAGE) | sudo k3s ctr images import -
 
+k-delete:
+	kubectl delete deploy stackmap-api
+
+k-deploy:
+	kubectl apply -f https://raw.githubusercontent.com/eysteinn/stackmap-api/main/deployment.yaml
+
 #swagger-build:
 #	swagger generate spec -i ./swagger/swagger_base.yaml -o ./swagger.yaml
 

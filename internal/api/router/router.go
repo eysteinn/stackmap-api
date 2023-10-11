@@ -158,8 +158,8 @@ func Setup() *chi.Mux {
 		AllowCredentials: false,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	  }))*/
-	router.Use(Cors)
 	router.Use(middleware.Logger)
+	router.Use(Cors)
 	router.Mount("/api/v1/", products_routes())
 
 	router.Get("/api/v1/times", timesRoute)
