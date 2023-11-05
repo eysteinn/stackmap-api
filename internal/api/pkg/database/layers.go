@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/jinzhu/gorm"
 	"gitlab.com/EysteinnSig/stackmap-api/internal/api/pkg/logger"
@@ -42,8 +43,10 @@ func GetAvailableTimes(project string, product string) (ProductTimes, error) { /
 	prodTimes := ProductTimes{Product: product}
 	//result := GetDB().Model(Raster_geoms{}).Select("datetime").Find(&prodTimes.Times, "product = ?", product)
 	result := GetDB().Table("project_"+project+".raster_geoms").Select("datetime").Find(&prodTimes.Times, "product = ?", product)
-
 	fmt.Println(result.RowsAffected)
+	sort.Slice(prodTimes.Times, func(i, j int) bool {
+		return prodTimes.Times[i].Before(prodTimes.Times[j])
+	})
 	return prodTimes, result.Error
 	/*for _, layer := range layers {
 		fmt.Println("Layer: ", layer)
