@@ -1,24 +1,25 @@
 swagger: "2.0"
-info: 
+info:
   version: "1.0.0"
   title: "Stackmap API"
-  description: "Query and push Stackmap related products"
-  #termsOfService: "http://swagger.io/terms/"
-  contact: 
-    name: "Someone"
-  license: 
-    name: "MIT"
+  description: "API for managing projects and files"
 host: "localhost:3000"
-basePath: "/api/v1/"
-schemes: 
+schemes:
   - "http"
-consumes: 
+consumes:
   - "application/json"
-produces: 
+produces:
   - "application/json"
-paths: 
-  /products: 
-    $ref: ./paths/products.yaml
-  /times:
-    $ref: ./paths/times.yaml
-  
+paths:
+  /login:
+    $ref: "./paths/auth.yaml#/~1login"
+  /register:
+    $ref: "./paths/auth.yaml#/~1register"
+  /refresh-token:
+    $ref: "./paths/auth.yaml#/~1refresh-token"
+  /api/v1/projects:
+    $ref: "./paths/projects.yaml#/~1api~1v1~1projects"
+  /api/v1/projects/{project_name}:
+    $ref: "./paths/project_delete.yaml#/~1api~1v1~1projects~1{project_name}"
+  /api/v1/projects/{project_name}/files:
+    $ref: "./paths/files.yaml#/~1api~1v1~1projects~1{project_name}~1files"

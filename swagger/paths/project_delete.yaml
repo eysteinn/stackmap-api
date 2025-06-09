@@ -1,0 +1,16 @@
+/api/v1/projects/{project_name}:
+  delete:
+    summary: Delete a project by name
+    parameters:
+      - name: project_name
+        in: path
+        required: true
+        type: string
+    responses:
+      "200":
+        description: Operation result
+        schema:
+          type: object
+          properties:
+            result:
+              type: string
