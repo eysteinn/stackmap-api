@@ -1,0 +1,26 @@
+/api/v1/projects/{project_name}/files:
+  post:
+    summary: Upload a file to a project
+    consumes:
+      - multipart/form-data
+    parameters:
+      - name: project_name
+        in: path
+        required: true
+        type: string
+      - name: file
+        in: formData
+        required: true
+        type: file
+      - name: description
+        in: formData
+        required: false
+        type: string
+    responses:
+      "200":
+        description: Operation result
+        schema:
+          type: object
+          properties:
+            result:
+              type: string

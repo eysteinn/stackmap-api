@@ -1,0 +1,52 @@
+/api/v1/projects:
+  get:
+    summary: List projects owned by the authenticated user
+    produces:
+      - application/json
+    responses:
+      "200":
+        description: Array of projects
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              wms:
+                type: string
+              project_id:
+                type: integer
+              name:
+                type: string
+              description:
+                type: string
+              created_at:
+                type: string
+                format: date-time
+              updated_at:
+                type: string
+                format: date-time
+  post:
+    summary: Create a new project
+    consumes:
+      - application/json
+    parameters:
+      - in: body
+        name: project
+        required: true
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+          required:
+            - name
+    responses:
+      "200":
+        description: Operation result
+        schema:
+          type: object
+          properties:
+            result:
+              type: string
