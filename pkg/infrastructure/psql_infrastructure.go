@@ -62,5 +62,6 @@ func (infra *psqlInfrastructure) Create() (err error) {
 	if _, err = db.Exec(sql_create_refresh_tokens_table); err != nil {
 		return err
 	}
+
 	return nil
 }

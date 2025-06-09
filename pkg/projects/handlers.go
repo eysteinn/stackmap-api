@@ -3,11 +3,11 @@ package projects
 import (
 	"encoding/json"
 	"log/slog"
-	"mime"
 	"net/http"
 
 	"github.com/justinas/alice"
 	"gitlab.com/EysteinnSig/stackmap-api/pkg/contextdata"
+	"gitlab.com/EysteinnSig/stackmap-api/pkg/utils"
 )
 
 func createDeleteHandler(service ProjectStore) http.HandlerFunc {
@@ -80,16 +80,6 @@ func createListHandler3(service ProjectStore) fiber.Handler {
 	}
 }*/
 
-func parseContentType(contentType string) string {
-	if contentType == "" {
-		return ""
-	}
-	if ct, _, err := mime.ParseMediaType(contentType); err == nil {
-		return ct
-	}
-	return ""
-}
-
 func createCreateHandler(service ProjectStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -104,7 +94,7 @@ func createCreateHandler(service ProjectStore) http.HandlerFunc {
 			return
 		}
 		var data Data
-		contentType := parseContentType(r.Header.Get("Content-Type"))
+		contentType := utils.ParseContentType(r.Header.Get("Content-Type"))
 		switch contentType {
 		case "multipart/form-data":
 			if err := r.ParseMultipartForm(10 << 20); err != nil { // 10MB max memory
@@ -155,7 +145,8 @@ func AddRoutes(mux *http.ServeMux, chain *alice.Chain, service ProjectStore) {
 
 	//context.WithValue()
 	mux.Handle("GET /api/v1/projects", chain.ThenFunc(createListHandler(service)))
-	mux.Handle("DELETE /api/v1/projects/{project_name}", chain.ThenFunc(createDeleteHandler(service)))
+	protectProject := chain.Append(CreateAuthProjectAccessMiddleware(service))
+	mux.Handle("DELETE /api/v1/projects/{project_name}", protectProject.ThenFunc(createDeleteHandler(service)))
 	mux.Handle("POST /api/v1/projects", chain.ThenFunc(createCreateHandler(service)))
 
 }

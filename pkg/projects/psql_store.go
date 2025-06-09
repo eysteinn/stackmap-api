@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
-	"fmt"
 	"log"
 	"log/slog"
 	"strings"
@@ -17,6 +16,9 @@ import (
 
 //go:embed sql_create_files_table.sql
 var sql_create_files_table string
+
+//go:embed sql_create_files_process_queue.sql
+var sql_create_files_process_queue_table string
 
 //go:embed sql_create_raster_geoms_table.sql
 var sql_create_raster_geoms_table string
@@ -50,18 +52,26 @@ func (store *PSQLProjectStore) CreateProject(name, description string, ownerid i
 
 	//create_tbl_cmd = strings.ReplaceAll(create_tbl_cmd, "{SCHEMA}", schema)
 	create_schema_cmd := strings.ReplaceAll(sql_create_schema, "{{SCHEMA}}", schema)
-	fmt.Println("Create schema: ", create_schema_cmd)
 	_, err = db.Exec(create_schema_cmd)
 	if err != nil {
 		return err
 	}
 
+	slog.Debug("create files table")
 	create_files_cmd := strings.ReplaceAll(sql_create_files_table, "{{SCHEMA}}", schema)
 	_, err = db.Exec(create_files_cmd)
 	if err != nil {
 		return err
 	}
 
+	slog.Debug("create files process queue table")
+	sql_create_files_process_queue_cmd := strings.ReplaceAll(sql_create_files_process_queue_table, "{{SCHEMA}}", schema)
+	_, err = db.Exec(sql_create_files_process_queue_cmd)
+	if err != nil {
+		return err
+	}
+
+	slog.Debug("create raster geoms table")
 	create_raster_geoms_cmd := strings.ReplaceAll(sql_create_raster_geoms_table, "{{SCHEMA}}", schema)
 	_, err = db.Exec(create_raster_geoms_cmd)
 	if err != nil {
@@ -88,6 +98,9 @@ func (store *PSQLProjectStore) CreateProject(name, description string, ownerid i
 	slog.Debug("insert into table user_projects")
 
 	_, err = db.Exec("INSERT INTO public.user_projects (user_id, project_id, role) VALUES ($1, $2, $3)", ownerid, projectID, "admin")
+	if err != nil {
+		return err
+	}
 	return nil
 
 }

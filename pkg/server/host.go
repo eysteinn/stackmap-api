@@ -30,6 +30,7 @@ type Server struct {
 	Logger            *slog.Logger
 }
 
+/*
 type timeHandler struct {
 	format string
 }
@@ -37,7 +38,7 @@ type timeHandler struct {
 func (th timeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	tm := time.Now().Format(th.format)
 	w.Write([]byte("The time is: " + tm))
-}
+}*/
 
 func LoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +71,7 @@ func (server *Server) Serve() error {
 	println("User: ", user, "   Sample JWT:", token)*/
 
 	mux := http.NewServeMux()
-	th := timeHandler{format: time.RFC1123}
+	//th := timeHandler{format: time.RFC1123}
 
 	//projectService := projects.NewService(server.ProjectStore)
 
@@ -82,7 +83,11 @@ func (server *Server) Serve() error {
 	chain := alice.New(LoggingMiddleware, contextdata.AddDataToContextMiddleware, JWTMiddleware)
 
 	projects.AddRoutes(mux, &chain, server.ProjectStore) // projectService)
-	mux.Handle("GET /time", th)
+
+	protectProjectChain := chain.Append(projects.CreateAuthProjectAccessMiddleware(server.ProjectStore))
+	files.AddRoutes(mux, &protectProjectChain, server.FileStore)
+
+	//mux.Handle("GET /time", th)
 	mux.Handle("POST /register", auth.CreateRegisterUserHandler(server.UserStore))
 	//handler := slog.NewJSONHandler(os.Stdout, nil)
 	logger := slog.NewLogLogger(server.Logger.Handler(), slog.LevelDebug)

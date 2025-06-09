@@ -89,7 +89,7 @@ func init() {
 	if rootCmd.Flags().Lookup("jwtsecret").Changed == false {
 		slog.Info("Setting jwtsecret to default", "jwtsecret", defjwtsecret)
 	}
-	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
+	//viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 	viper.BindPFlag(utils.JWT_SECRET_KEY, rootCmd.Flags().Lookup("jwtsecret"))
 	// Initialize Viper
 	//cobra.OnInitialize(initConfig)
